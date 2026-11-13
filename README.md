@@ -31,7 +31,7 @@ Free, no dependencies, no tracking. A floating WhatsApp button for any website i
 
 [Quick start](#quick-start) · [Generator](#generator) · [Options](#options) · [Greeting popup](#greeting-popup) · [JavaScript API](#javascript-api) ·
 [HTML](#plain-html) · [WordPress](#wordpress) · [Shopify](#shopify) · [Wix](#wix) · [Squarespace](#squarespace) · [Webflow](#webflow) · [Google Tag Manager](#google-tag-manager) · [React and Next.js](#react-and-nextjs) ·
-[HTML and CSS only](#html-and-css-only-no-javascript) · [Content-Security-Policy](#content-security-policy) · [Accessibility](#accessibility) · [Privacy](#privacy) · [Browser support](#browser-support) · [FAQ](#faq) · [Brand and trademarks](#brand-and-trademarks) · [Development](#development)
+[HTML and CSS only](#html-and-css-only-no-javascript) · [Content-Security-Policy](#content-security-policy) · [Accessibility](#accessibility) · [Privacy](#privacy) · [Browser support](#browser-support) · [FAQ](#faq) · [Brand and trademarks](#brand-and-trademarks) · [Development](#development) · [Shared inbox](#need-a-shared-inbox-for-whatsapp)
 
 ## Quick start
 
@@ -433,18 +433,22 @@ npm install
 npx playwright install chromium   # add firefox webkit to test those too
 npm run build                     # src/ → dist/ with terser, then prints the size
 npm test                          # browser tests (BROWSER=firefox or webkit for the others)
+npm run check                     # size budget, one version everywhere, package lint
 npm run screenshots               # the images in assets/
 ```
 
 - `src/whatsapp-chat-button.js`: the script. `dist/` is committed, because jsDelivr serves it from the Git tags.
 - `index.html`: the [generator](https://replyze.github.io/whatsapp-chat-button/), served by GitHub Pages from the repository root.
 - `tests/browser.test.cjs`: 35 tests in a real browser. It serves every page itself and blocks all other requests, so it runs offline and fails if the script makes a request. Besides the script, it runs the marked code blocks of this README, the HTML-only example and the generator's output.
+- CI runs the tests in Chromium, Firefox and WebKit, checks that `dist/` is the build of `src/`, and checks the size and the package. Releases: [RELEASING.md](RELEASING.md). Changes: [CHANGELOG.md](CHANGELOG.md).
 
 Bugs, questions and platforms that are missing: open an issue or a pull request.
 
-## When one phone isn't enough
+## Need a shared inbox for WhatsApp?
 
-This button sends visitors to one phone. When a team answers them, [Replyze](https://replyze.chat/?utm_source=github&utm_medium=whatsapp-chat-button) puts WhatsApp, website chat, email and Telegram in one shared inbox, with an AI agent that answers from your docs and hands the chat to a person when needed. It connects your WhatsApp Business number through Meta's WhatsApp Business Platform. [Sign up](https://client.replyze.chat/register?utm_source=github&utm_medium=whatsapp-chat-button) · [Live chat for your website](https://github.com/Replyze/add-live-chat-to-website)
+This button sends visitors to one phone. Need a shared inbox for WhatsApp with AI answers? [Replyze](https://replyze.chat/?utm_source=github&utm_medium=whatsapp-chat-button&utm_content=footer) puts WhatsApp, website chat, email and Telegram in one inbox for your team, with an AI agent that answers from your docs and hands the chat to a person when needed. It connects your WhatsApp Business number through Meta's WhatsApp Business Platform.
+
+[Create a free account](https://client.replyze.chat/register?utm_source=github&utm_medium=whatsapp-chat-button&utm_content=footer) · [Live demo](https://replyze.chat/?utm_source=github&utm_medium=whatsapp-chat-button&utm_content=live-demo) · [Docs](https://github.com/Replyze/replyze)
 
 ## License
 

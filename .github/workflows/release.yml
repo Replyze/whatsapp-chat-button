@@ -1,0 +1,70 @@
+# Push a tag vX.Y.Z (see RELEASING.md): tests, build check, GitHub release, then npm.
+# The npm step runs only when NPM_TOKEN (secret) or NPM_TRUSTED_PUBLISHING=true (variable) is set.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # the GitHub release
+      id-token: write # npm provenance and trusted publishing
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NPM_TRUSTED_PUBLISHING: ${{ vars.NPM_TRUSTED_PUBLISHING }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - name: The tag matches package.json
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME, but package.json says $version."
+            exit 1
+          fi
+      - name: dist/ in the tag is the build (jsDelivr serves it from the tag)
+        run: |
+          npm run build
+          git diff --exit-code -- dist
+      - name: Release notes from CHANGELOG.md
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="## [$version]" 'index($0, v) == 1 { found = 1; next } found && /^## / { exit } found' CHANGELOG.md > notes.md
+          if ! grep -q '[^[:space:]]' notes.md; then
+            echo "::error::CHANGELOG.md has no section ## [$version]."
+            exit 1
+          fi
+          cat notes.md
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/whatsapp-chat-button.min.js --verify-tag --title "$GITHUB_REF_NAME" --notes-file notes.md
+      - name: Publish to npm
+        if: env.NPM_TOKEN != '' || env.NPM_TRUSTED_PUBLISHING == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm install -g npm@11
+          npm publish --provenance --access public
+      - name: npm publish skipped
+        if: env.NPM_TOKEN == '' && env.NPM_TRUSTED_PUBLISHING != 'true'
+        run: echo "::notice::npm publish skipped. Set the NPM_TOKEN secret or the NPM_TRUSTED_PUBLISHING variable, see RELEASING.md."

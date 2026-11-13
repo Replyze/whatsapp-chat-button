@@ -100,6 +100,11 @@ async function load(html, opts = {}) {
 async function settle(page) {
   await page.waitForSelector(HOST + ' .w.v', { state: 'attached', timeout: 5000 });
   await page.waitForTimeout(400);
+  // On a cold or busy machine the fade-in can outlast the wait: let it finish.
+  await page.evaluate(() => {
+    const wrap = document.querySelector('whatsapp-chat-button').shadowRoot.querySelector('.w');
+    return Promise.all(wrap.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => {})));
+  });
 }
 
 const inShadow = (page, fn, arg) =>
