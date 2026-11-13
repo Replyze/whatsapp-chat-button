@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://replyze.chat/?utm_source=github&utm_medium=whatsapp-chat-button">
+  <a href="https://replyze.chat/?utm_source=github&utm_medium=referral&utm_campaign=whatsapp-chat-button">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Replyze/.github/main/assets/logo-on-dark.png">
       <img src="https://raw.githubusercontent.com/Replyze/.github/main/assets/logo-on-light.png" alt="Replyze" height="48">
@@ -446,9 +446,9 @@ Bugs, questions and platforms that are missing: open an issue or a pull request.
 
 ## Need a shared inbox for WhatsApp?
 
-This button sends visitors to one phone. Need a shared inbox for WhatsApp with AI answers? [Replyze](https://replyze.chat/?utm_source=github&utm_medium=whatsapp-chat-button&utm_content=footer) puts WhatsApp, website chat, email and Telegram in one inbox for your team, with an AI agent that answers from your docs and hands the chat to a person when needed. It connects your WhatsApp Business number through Meta's WhatsApp Business Platform.
+This button sends visitors to one phone. Need a shared inbox for WhatsApp with AI answers? [Replyze](https://replyze.chat/?utm_source=github&utm_medium=referral&utm_campaign=whatsapp-chat-button&utm_content=footer) puts WhatsApp, website chat, email and Telegram in one inbox for your team, with an AI agent that answers from your docs and hands the chat to a person when needed. It connects your WhatsApp Business number through Meta's WhatsApp Business Platform.
 
-[Create a free account](https://client.replyze.chat/register?utm_source=github&utm_medium=whatsapp-chat-button&utm_content=footer) · [Live demo](https://replyze.chat/?utm_source=github&utm_medium=whatsapp-chat-button&utm_content=live-demo) · [Docs](https://github.com/Replyze/replyze)
+[Create a free account](https://client.replyze.chat/register?utm_source=github&utm_medium=referral&utm_campaign=whatsapp-chat-button&utm_content=footer) · [Live demo](https://replyze.chat/?utm_source=github&utm_medium=referral&utm_campaign=whatsapp-chat-button&utm_content=live-demo) · [Docs](https://github.com/Replyze/replyze)
 
 ## License
 
