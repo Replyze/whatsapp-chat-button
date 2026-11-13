@@ -101,11 +101,14 @@ async function load(html, opts = {}) {
 // finished: on a cold or busy machine they can outlast a fixed wait.
 async function transitions(page, ms = 300) {
   await page.waitForTimeout(ms);
-  await page.evaluate(() => {
+  const done = await page.evaluate(() => {
     const host = document.querySelector('whatsapp-chat-button');
     const wrap = host && host.shadowRoot.querySelector('.w');
-    if (wrap) return Promise.all(wrap.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => {})));
+    if (!wrap) return true;
+    const all = Promise.all(wrap.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => {})));
+    return Promise.race([all.then(() => true), new Promise((resolve) => setTimeout(() => resolve(false), 2000))]);
   });
+  if (!done) console.log('      (transitions still running after 2 s)');
 }
 
 // The button is in place and its fade-in has finished.
