@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp button: one script tag</title>
+<style>
+  body { margin: 0 auto; max-width: 720px; padding: 40px 16px 120px; font: 17px/1.6 system-ui, sans-serif; color: #1f2937; }
+  code { font-size: 15px; }
+</style>
+</head>
+<body>
+<h1>One script tag</h1>
+<p>The button with a number, a pre-filled message and a label. Every option is a <code>data-</code> attribute.</p>
+
+<script src="../dist/whatsapp-chat-button.min.js"
+  data-phone="+1 (555) 123-4567"
+  data-message="Hi! I have a question about {title}"
+  data-label="Chat with us"
+  defer></script>
+</body>
+</html>

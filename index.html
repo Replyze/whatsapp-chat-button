@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp chat button generator: free code for your website</title>
+<meta name="description" content="Free WhatsApp chat button generator. Enter your number, pick a colour and a greeting, see a live preview and copy one script tag or a pure HTML and CSS version. No tracking.">
+<link rel="canonical" href="https://replyze.github.io/whatsapp-chat-button/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WhatsApp chat button generator">
+<meta property="og:description" content="Free floating WhatsApp button for any website: live preview, one script tag or pure HTML and CSS. No dependencies, no tracking.">
+<meta property="og:url" content="https://replyze.github.io/whatsapp-chat-button/">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%230f766e' d='M6 4h20a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H14l-7 6v-6H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "WhatsApp chat button generator",
+  "url": "https://replyze.github.io/whatsapp-chat-button/",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@type": "Organization", "name": "Replyze", "url": "https://replyze.chat/" }
+}
+</script>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --ink: #0f172a;
+    --muted: #526077;
+    --line: #dfe3ea;
+    --field: #ffffff;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --soft: #eef6f5;
+    --warn: #9a3412;
+    --warn-bg: #fff4ec;
+    --code-bg: #0f172a;
+    --code-ink: #e2e8f0;
+    --focus: #2563eb;
+    --shadow: 0 1px 2px rgba(15, 23, 42, .06), 0 8px 24px rgba(15, 23, 42, .06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0f17;
+      --panel: #121826;
+      --ink: #e6e9ef;
+      --muted: #9aa5b8;
+      --line: #263042;
+      --field: #0f1522;
+      --accent: #2cc4b0;
+      --accent-ink: #04221f;
+      --soft: #11262a;
+      --warn: #fdba74;
+      --warn-bg: #2a1b10;
+      --code-bg: #070b13;
+      --code-ink: #dbe3ef;
+      --focus: #7aa7ff;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+  header.top { padding: 40px 0 24px; }
+  .eyebrow { margin: 0 0 8px; color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: .02em; }
+  h1 { margin: 0 0 10px; font-size: clamp(28px, 4.2vw, 42px); line-height: 1.15; letter-spacing: -.02em; }
+  .lead { margin: 0; max-width: 680px; color: var(--muted); font-size: 18px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+  .pills li { padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; background: var(--panel); color: var(--muted); font-size: 14px; }
+
+  .grid { display: grid; gap: 24px; align-items: start; padding-bottom: 40px; }
+  @media (min-width: 980px) {
+    .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+    .out { position: sticky; top: 16px; }
+  }
+  .card { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+
+  form.card { padding: 8px 24px 24px; }
+  fieldset { min-width: 0; margin: 0; padding: 20px 0 4px; border: 0; border-top: 1px solid var(--line); }
+  fieldset:first-of-type { border-top: 0; }
+  legend { float: left; width: 100%; margin: 0 0 12px; padding: 0; font-weight: 700; font-size: 17px; }
+  legend + * { clear: both; }
+  .field { margin: 0 0 16px; }
+  .field > label, .label { display: block; margin: 0 0 6px; font-weight: 600; font-size: 15px; }
+  .hint { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0 16px; }
+  input[type=text], input[type=tel], input[type=url], input[type=number], textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--field);
+    color: var(--ink);
+    font: inherit;
+  }
+  textarea { min-height: 76px; resize: vertical; }
+  input:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  input[type=checkbox], input[type=radio] { accent-color: var(--accent); width: 18px; height: 18px; margin: 0; flex: none; }
+  .check { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 15px; cursor: pointer; }
+  .seg { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+  .seg label { position: relative; }
+  .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .seg span { display: block; padding: 6px 16px; border-radius: 8px; color: var(--muted); font-size: 15px; cursor: pointer; }
+  .seg input:checked + span { background: var(--panel); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+  .seg input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .color { display: flex; gap: 8px; }
+  .color input[type=color] { flex: none; width: 46px; height: 44px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--field); cursor: pointer; }
+  .status { margin: 8px 0 0; padding: 8px 12px; border-radius: 10px; background: var(--soft); font-size: 14px; overflow-wrap: anywhere; }
+  .status.warn { background: var(--warn-bg); color: var(--warn); }
+  .status code { font-size: 13px; }
+  .sub { margin: 4px 0 0 0; padding: 14px 16px 2px; border-left: 3px solid var(--line); }
+  .sub[hidden] { display: none; }
+  details { border-top: 1px solid var(--line); padding: 16px 0 0; margin-top: 4px; }
+  summary { font-weight: 700; font-size: 17px; cursor: pointer; }
+  details[open] summary { margin-bottom: 14px; }
+
+  .out { padding: 0; overflow: hidden; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .bar h2 { margin: 0; font-size: 16px; }
+  .tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+  .tabs button {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    background: var(--panel);
+    color: var(--muted);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .tabs button[aria-selected=true], .tabs button[aria-pressed=true] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .stage { display: flex; justify-content: center; padding: 16px; background: repeating-linear-gradient(45deg, var(--bg), var(--bg) 10px, transparent 10px, transparent 20px), var(--bg); }
+  .stage iframe { display: block; width: 100%; height: 360px; border: 1px solid var(--line); border-radius: 12px; background: #fff; transition: width .2s; }
+  .stage.mobile iframe { width: 375px; max-width: 100%; height: 600px; border-radius: 28px; border-width: 8px; border-color: #1f2937; }
+  .code { position: relative; }
+  pre {
+    margin: 0;
+    padding: 16px;
+    max-height: 300px;
+    overflow: auto;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px 16px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn.ghost { border: 1px solid var(--line); background: transparent; color: var(--ink); font-weight: 600; }
+  .note { margin: 0; padding: 0 16px 16px; color: var(--muted); font-size: 14px; }
+  .copied { color: var(--accent); font-weight: 600; font-size: 14px; }
+
+  section.more { padding: 8px 0 40px; }
+  section.more h2 { margin: 0 0 12px; font-size: 24px; letter-spacing: -.01em; }
+  .cols { display: grid; gap: 24px; }
+  @media (min-width: 860px) { .cols { grid-template-columns: 1fr 1fr; } }
+  .more .card { padding: 20px 24px; }
+  .more ol { margin: 0; padding-left: 20px; }
+  .more li { margin: 0 0 8px; }
+  .platforms { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .platforms a { display: inline-block; padding: 6px 12px; border: 1px solid var(--line); border-radius: 99px; color: var(--ink); text-decoration: none; font-size: 14px; }
+  .platforms a:hover { border-color: var(--accent); }
+  dl { margin: 0; }
+  dt { font-weight: 700; margin: 0 0 4px; }
+  dd { margin: 0 0 14px; color: var(--muted); }
+
+  footer { padding: 24px 0 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  footer p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Free tool · open source (MIT)</p>
+    <h1>WhatsApp chat button generator</h1>
+    <p class="lead">Put a floating WhatsApp button on your website. Enter your number, choose how it looks, check the preview and copy the code.</p>
+    <ul class="pills" aria-label="Features">
+      <li>One script tag</li>
+      <li>No dependencies</li>
+      <li>No tracking or cookies</li>
+      <li>Greeting popup</li>
+      <li>HTML and CSS only version</li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap grid">
+  <form class="card" id="form" autocomplete="off" novalidate>
+    <fieldset>
+      <legend>Your WhatsApp number</legend>
+      <div class="field">
+        <label for="phone">Phone number</label>
+        <input type="tel" id="phone" inputmode="tel" placeholder="+1 555 123 4567" value="+1 555 123 4567" aria-describedby="phone-hint phone-status">
+        <p class="hint" id="phone-hint">With the country code. Spaces, dashes, brackets and a leading + are fine.</p>
+        <p class="status" id="phone-status" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="message">Pre-filled message <span class="hint">(optional)</span></label>
+        <textarea id="message" rows="2" aria-describedby="message-hint">Hi! I have a question.</textarea>
+        <p class="hint" id="message-hint">The visitor sees it in WhatsApp and can change it before sending. <code>{url}</code> and <code>{title}</code> become the page's address and title.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Button</legend>
+      <div class="row">
+        <div class="field">
+          <span class="label" id="position-label">Position</span>
+          <div class="seg" role="radiogroup" aria-labelledby="position-label">
+            <label><input type="radio" name="position" id="position-right" value="right" checked><span>Right</span></label>
+            <label><input type="radio" name="position" id="position-left" value="left"><span>Left</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="color-text">Colour</label>
+          <div class="color">
+            <input type="color" id="color" value="#25d366" aria-label="Pick a colour">
+            <input type="text" id="color-text" value="#25D366" spellcheck="false">
+          </div>
+        </div>
+      </div>
+      <p class="status warn" id="color-status" hidden></p>
+      <div class="field">
+        <label for="size">Size: <span id="size-value">56</span> px</label>
+        <input type="range" id="size" min="40" max="80" step="2" value="56" style="width:100%;accent-color:var(--accent)">
+      </div>
+      <div class="field">
+        <label for="label">Label next to the button <span class="hint">(optional)</span></label>
+        <input type="text" id="label" placeholder="Chat with us">
+      </div>
+      <label class="check"><input type="checkbox" id="label-hover"> Show the label only on hover (like a tooltip)</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Greeting popup</legend>
+      <label class="check"><input type="checkbox" id="popup" aria-controls="popup-fields"> Show a greeting popup first, with a "Start chat" button</label>
+      <div class="sub" id="popup-fields" hidden>
+        <div class="row">
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" value="Support team">
+          </div>
+          <div class="field">
+            <label for="subtitle">Line under the name</label>
+            <input type="text" id="subtitle" value="Typically replies within an hour">
+          </div>
+        </div>
+        <div class="field">
+          <label for="avatar">Photo or logo URL <span class="hint">(optional, square works best)</span></label>
+          <input type="url" id="avatar" placeholder="https://example.com/photo.jpg">
+        </div>
+        <div class="field">
+          <label for="greeting">Greeting</label>
+          <textarea id="greeting" rows="2">Hi there 👋 How can we help you?</textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="cta">Button text</label>
+            <input type="text" id="cta" value="Start chat">
+          </div>
+          <div class="field">
+            <label for="popup-delay">Open by itself after (seconds)</label>
+            <input type="number" id="popup-delay" min="0" step="1" value="0" aria-describedby="popup-delay-hint">
+            <p class="hint" id="popup-delay-hint">0 = only when clicked.</p>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>When to show it</legend>
+      <div class="row">
+        <div class="field">
+          <label for="show-after">After (seconds)</label>
+          <input type="number" id="show-after" min="0" step="1" value="0">
+        </div>
+        <div class="field">
+          <label for="show-on-scroll">After scrolling (% of the page)</label>
+          <input type="number" id="show-on-scroll" min="0" max="100" step="5" value="0">
+        </div>
+      </div>
+      <p class="hint" style="margin-top:-8px;margin-bottom:14px">With both set, it shows at whichever comes first. 0 = right away.</p>
+      <label class="check"><input type="checkbox" id="hide-mobile"> Hide on phones (screens narrower than 768 px)</label>
+      <label class="check"><input type="checkbox" id="hide-desktop"> Hide on desktops (768 px and wider)</label>
+    </fieldset>
+
+    <details>
+      <summary>Advanced</summary>
+      <div class="row">
+        <div class="field">
+          <label for="offset-x">Distance from the side (px)</label>
+          <input type="number" id="offset-x" min="0" step="1" value="20">
+        </div>
+        <div class="field">
+          <label for="offset-y">Distance from the bottom (px)</label>
+          <input type="number" id="offset-y" min="0" step="1" value="20">
+        </div>
+        <div class="field">
+          <label for="z-index">z-index</label>
+          <input type="number" id="z-index" step="1" value="9999">
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="new-tab" checked> Open WhatsApp in a new tab</label>
+      <div class="row">
+        <div class="field">
+          <label for="aria-label">Name for screen readers</label>
+          <input type="text" id="aria-label" value="Chat on WhatsApp">
+        </div>
+        <div class="field">
+          <label for="close-label">"Close" in your language</label>
+          <input type="text" id="close-label" value="Close">
+        </div>
+      </div>
+    </details>
+  </form>
+
+  <section class="card out" aria-labelledby="out-title">
+    <div class="bar">
+      <h2 id="out-title">Preview</h2>
+      <div class="tabs" role="group" aria-label="Preview size">
+        <button type="button" data-device="desktop" aria-pressed="true">Desktop</button>
+        <button type="button" data-device="mobile" aria-pressed="false">Phone</button>
+      </div>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="preview" title="Preview of the button on a sample page"></iframe>
+    </div>
+    <div class="bar">
+      <h2>Your code</h2>
+      <div class="tabs" role="tablist" aria-label="Code format">
+        <button type="button" role="tab" id="tab-script" data-tab="script" aria-selected="true" aria-controls="code-panel">Script tag</button>
+        <button type="button" role="tab" id="tab-html" data-tab="html" aria-selected="false" aria-controls="code-panel">HTML only</button>
+        <button type="button" role="tab" id="tab-link" data-tab="link" aria-selected="false" aria-controls="code-panel">Link</button>
+      </div>
+    </div>
+    <div class="code" id="code-panel" role="tabpanel" aria-labelledby="tab-script">
+      <pre tabindex="0"><code id="code"></code></pre>
+      <div class="actions">
+        <button type="button" class="btn" id="copy">Copy code</button>
+        <a class="btn ghost" id="test-link" href="https://wa.me/" target="_blank" rel="noopener">Test the link</a>
+        <span class="copied" id="copied" role="status" aria-live="polite"></span>
+      </div>
+      <p class="note" id="code-note"></p>
+    </div>
+  </section>
+</main>
+
+<section class="wrap more" aria-labelledby="install-title">
+  <div class="cols">
+    <div class="card">
+      <h2 id="install-title">How to add it to your website</h2>
+      <ol>
+        <li>Copy the code above.</li>
+        <li>Paste it right before <code>&lt;/body&gt;</code> on every page, or in your site builder's footer code box.</li>
+        <li>Publish, open your site and click the button.</li>
+      </ol>
+      <p>Step-by-step guides:</p>
+      <ul class="platforms">
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#plain-html">HTML</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#wordpress">WordPress</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#shopify">Shopify</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#wix">Wix</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#squarespace">Squarespace</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#webflow">Webflow</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#google-tag-manager">Google Tag Manager</a></li>
+        <li><a href="https://github.com/Replyze/whatsapp-chat-button#react-and-nextjs">React and Next.js</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Questions</h2>
+      <dl>
+        <dt>Do I need WhatsApp Business?</dt>
+        <dd>No. The button opens a <code>wa.me</code> link, which works with any number that has WhatsApp, on the regular app or the Business app.</dd>
+        <dt>What happens when someone clicks it?</dt>
+        <dd>On a phone, WhatsApp opens with your chat and the message ready to send. On a computer, WhatsApp Web or the desktop app opens.</dd>
+        <dt>Does it track visitors?</dt>
+        <dd>No. No cookies, no storage, no requests of its own. It only builds a link.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Source code, options and install guides: <a href="https://github.com/Replyze/whatsapp-chat-button">github.com/Replyze/whatsapp-chat-button</a>. MIT license.</p>
+    <p>Made by <a href="https://replyze.chat/?utm_source=github&amp;utm_medium=whatsapp-chat-button">Replyze</a>: one shared inbox for WhatsApp, website chat, email and Telegram, with an AI agent that answers from your docs.</p>
+    <p>Not affiliated with, endorsed or sponsored by WhatsApp or Meta. WhatsApp and the WhatsApp logo are trademarks of Meta Platforms, Inc. and its affiliates.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const CDN = 'https://cdn.jsdelivr.net/gh/Replyze/whatsapp-chat-button@1/dist/whatsapp-chat-button.min.js';
+  const LOCAL = new URL('dist/whatsapp-chat-button.min.js', location.href).href;
+  const GLYPH = 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z';
+  const DEF = { color: '#25D366', size: 56, offsetX: 20, offsetY: 20, zIndex: 9999, cta: 'Start chat', ariaLabel: 'Chat on WhatsApp', closeLabel: 'Close' };
+
+  const $ = (id) => document.getElementById(id);
+  const form = $('form');
+  let tab = 'script';
+  let device = 'desktop';
+
+  // The same normalisation as the script: "+44 (0)20 7946 0958" becomes 442079460958.
+  const digits = (p) => p.replace(/\(0\)/g, '').replace(/\D/g, '').replace(/^00/, '');
+  const attr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\r?\n/g, '&#10;');
+  const text = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const num = (id, def) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : def; };
+  const validColor = (c) => CSS.supports('color', c);
+
+  function read() {
+    return {
+      phone: $('phone').value,
+      message: $('message').value,
+      position: $('position-left').checked ? 'left' : 'right',
+      color: $('color-text').value.trim(),
+      size: num('size', DEF.size),
+      label: $('label').value.trim(),
+      labelHover: $('label-hover').checked,
+      popup: $('popup').checked,
+      name: $('name').value.trim(),
+      subtitle: $('subtitle').value.trim(),
+      avatar: $('avatar').value.trim(),
+      greeting: $('greeting').value.trim(),
+      cta: $('cta').value.trim() || DEF.cta,
+      popupDelay: Math.max(0, num('popup-delay', 0)),
+      showAfter: Math.max(0, num('show-after', 0)),
+      showOnScroll: Math.min(100, Math.max(0, num('show-on-scroll', 0))),
+      hideOnMobile: $('hide-mobile').checked,
+      hideOnDesktop: $('hide-desktop').checked,
+      offsetX: num('offset-x', DEF.offsetX),
+      offsetY: num('offset-y', DEF.offsetY),
+      zIndex: Math.round(num('z-index', DEF.zIndex)),
+      newTab: $('new-tab').checked,
+      ariaLabel: $('aria-label').value.trim() || DEF.ariaLabel,
+      closeLabel: $('close-label').value.trim() || DEF.closeLabel,
+    };
+  }
+
+  const link = (o) => 'https://wa.me/' + digits(o.phone) + (o.message ? '?text=' + encodeURIComponent(o.message) : '');
+
+  // The data- attributes that differ from the defaults, in a stable order.
+  function attributes(o) {
+    const a = [['phone', digits(o.phone)]];
+    if (o.message) a.push(['message', o.message]);
+    if (o.position === 'left') a.push(['position', 'left']);
+    if (validColor(o.color) && o.color.toLowerCase() !== DEF.color.toLowerCase()) a.push(['color', o.color]);
+    if (o.size !== DEF.size) a.push(['size', o.size]);
+    if (o.label) a.push(['label', o.label]);
+    if (o.label && o.labelHover) a.push(['label-hover', 'true']);
+    if (o.popup && o.greeting) {
+      a.push(['greeting', o.greeting]);
+      if (o.name) a.push(['name', o.name]);
+      if (o.subtitle) a.push(['subtitle', o.subtitle]);
+      if (o.avatar) a.push(['avatar', o.avatar]);
+      if (o.cta !== DEF.cta) a.push(['cta', o.cta]);
+      if (o.popupDelay > 0) a.push(['popup-delay', o.popupDelay]);
+      if (o.closeLabel !== DEF.closeLabel) a.push(['close-label', o.closeLabel]);
+    }
+    if (o.showAfter > 0) a.push(['show-after', o.showAfter]);
+    if (o.showOnScroll > 0) a.push(['show-on-scroll', o.showOnScroll + '%']);
+    if (o.hideOnMobile) a.push(['hide-on-mobile', 'true']);
+    if (o.hideOnDesktop) a.push(['hide-on-desktop', 'true']);
+    if (o.offsetX !== DEF.offsetX) a.push(['offset-x', o.offsetX]);
+    if (o.offsetY !== DEF.offsetY) a.push(['offset-y', o.offsetY]);
+    if (o.zIndex !== DEF.zIndex) a.push(['z-index', o.zIndex]);
+    if (!o.newTab) a.push(['new-tab', 'false']);
+    if (o.ariaLabel !== DEF.ariaLabel) a.push(['aria-label', o.ariaLabel]);
+    return a;
+  }
+
+  const scriptSnippet = (o, src) =>
+    '<script src="' + src + '"\n' +
+    attributes(o).map(([k, v]) => '  data-' + k + '="' + attr(v) + '"\n').join('') +
+    '  defer></' + 'script>';
+
+  // The no-JavaScript version: a fixed link and a few lines of CSS.
+  function htmlSnippet(o) {
+    const side = o.position === 'left' ? 'left' : 'right';
+    const color = validColor(o.color) ? o.color : DEF.color;
+    const label = o.label;
+    const name = !label ? o.ariaLabel : /whatsapp/i.test(label) ? label : label + ', WhatsApp';
+    const s = Math.round(o.size);
+    const i = Math.round(o.size * 0.54);
+    const target = o.newTab ? ' target="_blank" rel="noopener"' : '';
+    const lines = [
+      '<a class="whatsapp-float" href="' + attr(link(o)) + '"' + target + ' aria-label="' + attr(name) + '">',
+    ];
+    if (label) lines.push('  <span class="whatsapp-float-label">' + text(label) + '</span>');
+    lines.push(
+      '  <span class="whatsapp-float-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + GLYPH + '"/></svg></span>',
+      '</a>',
+      '<style>',
+      '  .whatsapp-float{position:fixed;' + side + ':' + o.offsetX + 'px;bottom:' + o.offsetY + 'px;z-index:' + o.zIndex + ';display:flex;' + (side === 'left' ? 'flex-direction:row-reverse;' : '') + 'align-items:center;gap:12px;border-radius:99px;font:600 14px/1.4 system-ui,sans-serif;color:#111b21;text-decoration:none}',
+      '  .whatsapp-float-icon{display:flex;align-items:center;justify-content:center;width:' + s + 'px;height:' + s + 'px;border-radius:50%;background:' + color + ';box-shadow:0 4px 16px rgba(0,0,0,.2);transition:transform .2s}',
+      '  .whatsapp-float-icon svg{width:' + i + 'px;height:' + i + 'px;fill:#fff}',
+      '  .whatsapp-float:hover .whatsapp-float-icon{transform:scale(1.06)}',
+      '  .whatsapp-float:focus-visible{outline:3px solid #111b21;outline-offset:3px}'
+    );
+    if (label) {
+      lines.push('  .whatsapp-float-label{padding:9px 14px;border-radius:10px;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2)' + (o.labelHover ? ';position:absolute;' + (side === 'left' ? 'left' : 'right') + ':calc(100% + 12px);white-space:nowrap;opacity:0;transition:opacity .2s' : '') + '}');
+      if (o.labelHover) lines.push('  .whatsapp-float:hover .whatsapp-float-label,.whatsapp-float:focus-visible .whatsapp-float-label{opacity:1}');
+    }
+    if (o.hideOnMobile) lines.push('  @media (max-width:767.98px){.whatsapp-float{display:none}}');
+    if (o.hideOnDesktop) lines.push('  @media (min-width:768px){.whatsapp-float{display:none}}');
+    lines.push(
+      '  @media (prefers-reduced-motion:reduce){.whatsapp-float-icon{transition:none}}',
+      '  @media print{.whatsapp-float{display:none}}',
+      '</style>'
+    );
+    return lines.join('\n');
+  }
+
+  function previewDoc(snippet) {
+    const line = (w) => '<p class="l" style="width:' + w + '%"></p>';
+    let body = '';
+    for (let k = 0; k < 9; k++) body += '<h2 class="t" style="width:' + (40 + (k * 13) % 35) + '%"></h2>' + line(96) + line(88) + line(92) + line(64) + '<div class="img"></div>';
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your website</title><style>' +
+      'body{margin:0;font:16px/1.5 system-ui,sans-serif;background:#fff;color:#1f2937}' +
+      'header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #eef0f3}' +
+      '.logo{width:28px;height:28px;border-radius:8px;background:#cbd5e1}.brand{width:90px;height:12px;border-radius:6px;background:#e2e8f0}' +
+      'nav{display:flex;gap:14px;margin-left:auto}nav i{display:block;width:44px;height:10px;border-radius:5px;background:#eef0f3}' +
+      'main{max-width:680px;margin:0 auto;padding:28px 20px 80px}' +
+      '.hero{height:26px;width:72%;border-radius:8px;background:#dfe5ec;margin:8px 0 14px}' +
+      '.t{height:18px;border-radius:6px;background:#e5e9ef;margin:28px 0 12px}.l{height:10px;border-radius:5px;background:#f1f4f7;margin:10px 0}' +
+      '.img{height:120px;border-radius:12px;background:#f4f6f9;margin:18px 0}' +
+      '@media (max-width:600px){nav{display:none}}' +
+      '</style></head><body><header><span class="logo"></span><span class="brand"></span><nav><i></i><i></i><i></i></nav></header>' +
+      '<main><div class="hero"></div>' + line(90) + line(70) + body + '</main>' + snippet + '</body></html>';
+  }
+
+  let timer;
+  function render() {
+    const o = read();
+    const n = digits(o.phone);
+
+    const status = $('phone-status');
+    if (!n) {
+      status.className = 'status warn';
+      status.textContent = 'Enter your WhatsApp number with the country code.';
+    } else if (n[0] === '0' || n.length < 7 || n.length > 15) {
+      status.className = 'status warn';
+      status.textContent = 'This does not look like an international number. Start with the country code and leave out the leading 0 of the local number, for example +44 7700 900123.';
+    } else {
+      status.className = 'status';
+      status.textContent = '';
+      status.append('Your link: ');
+      const c = document.createElement('code');
+      c.textContent = 'wa.me/' + n;
+      status.append(c);
+    }
+
+    const cs = $('color-status');
+    if (!validColor(o.color)) {
+      cs.hidden = false;
+      cs.textContent = 'This is not a colour. Use a hex code such as #25D366.';
+    } else {
+      const v = hexOf(o.color);
+      const L = [0.2126, 0.7152, 0.0722].reduce((sum, k, i) => sum + k * (v[i] / 255) ** 2.2, 0);
+      const whiteContrast = 1.05 / (L + 0.05);
+      cs.hidden = whiteContrast >= 1.6;
+      cs.textContent = 'The WhatsApp icon stays white, so it will be hard to see on this colour. Pick a darker one.';
+    }
+    $('size-value').textContent = o.size;
+    $('popup-fields').hidden = !o.popup;
+
+    let code = '';
+    let note = '';
+    if (tab === 'script') {
+      code = scriptSnippet(o, CDN);
+      note = 'Paste it right before </body> on every page, or in your site builder\'s footer code box.';
+    } else if (tab === 'html') {
+      code = htmlSnippet(o);
+      note = 'No JavaScript: the button, the label, the position and the colour. The greeting popup, the delays and the {url} and {title} placeholders need the script tag.';
+    } else {
+      code = link(o);
+      note = 'Use the link anywhere: an email signature, a social profile, a QR code. {url} and {title} only work with the script tag.';
+    }
+    $('code').textContent = code;
+    $('code-note').textContent = note;
+    $('test-link').href = link(o);
+
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const snippet = tab === 'html' ? htmlSnippet(o) : scriptSnippet(o, LOCAL);
+      $('preview').srcdoc = previewDoc(n ? snippet : '');
+    }, 250);
+  }
+
+  function hexOf(c) {
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.fillStyle = c;
+    const h = ctx.fillStyle;
+    return h[0] === '#' ? [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16)) : (h.match(/\d+/g) || []).map(Number);
+  }
+
+  // Keep the colour picker and the text field in sync.
+  $('color').addEventListener('input', () => { $('color-text').value = $('color').value.toUpperCase(); render(); });
+  $('color-text').addEventListener('input', () => {
+    const c = $('color-text').value.trim();
+    if (validColor(c)) {
+      const v = hexOf(c);
+      $('color').value = '#' + v.slice(0, 3).map((x) => (+x).toString(16).padStart(2, '0')).join('');
+    }
+  });
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+  form.addEventListener('submit', (e) => e.preventDefault());
+
+  document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
+    tab = b.dataset.tab;
+    document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    $('code-panel').setAttribute('aria-labelledby', b.id);
+    render();
+  }));
+  document.querySelectorAll('[data-device]').forEach((b) => b.addEventListener('click', () => {
+    device = b.dataset.device;
+    document.querySelectorAll('[data-device]').forEach((x) => {
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    $('stage').classList.toggle('mobile', device === 'mobile');
+  }));
+
+  $('copy').addEventListener('click', async () => {
+    const code = $('code').textContent;
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch (e) {
+      const t = document.createElement('textarea');
+      t.value = code;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand('copy');
+      t.remove();
+    }
+    $('copied').textContent = 'Copied';
+    setTimeout(() => { $('copied').textContent = ''; }, 2000);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

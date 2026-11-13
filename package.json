@@ -1,0 +1,26 @@
+{
+  "name": "whatsapp-chat-button",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WhatsApp chat button for your website: one script tag, no dependencies, no tracking.",
+  "license": "MIT",
+  "author": "Replyze (https://replyze.chat)",
+  "homepage": "https://replyze.github.io/whatsapp-chat-button/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Replyze/whatsapp-chat-button.git"
+  },
+  "main": "dist/whatsapp-chat-button.min.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "terser src/whatsapp-chat-button.js --ecma 2018 --compress passes=2 --mangle --comments some --output dist/whatsapp-chat-button.min.js && node scripts/size.cjs",
+    "test": "node tests/browser.test.cjs",
+    "screenshots": "node tests/screenshots.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0",
+    "terser": "^5.36.0"
+  }
+}

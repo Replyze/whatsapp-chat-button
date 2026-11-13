@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp button: greeting popup</title>
+<style>
+  body { margin: 0 auto; max-width: 720px; padding: 40px 16px 120px; font: 17px/1.6 system-ui, sans-serif; color: #1f2937; }
+  code { font-size: 15px; }
+</style>
+</head>
+<body>
+<h1>Greeting popup</h1>
+<p>Options as a JavaScript object. The button opens a greeting first; its "Start chat" button opens WhatsApp. Press Esc to close it.</p>
+
+<script>
+  window.WhatsAppChatButtonConfig = {
+    phone: '+44 20 7946 0958',
+    message: 'Hi! I am on {url}',
+    position: 'left',
+    name: 'Support team',
+    subtitle: 'Typically replies within an hour',
+    greeting: 'Hi there 👋\nHow can we help you?',
+    popupDelay: 5
+  };
+</script>
+<script src="../dist/whatsapp-chat-button.min.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.png binary
+# Served byte for byte by jsDelivr and pinned by its SRI hash in the README: never convert.
+dist/** -text
