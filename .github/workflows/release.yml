@@ -1,13 +1,18 @@
-# Push a tag vX.Y.Z (see RELEASING.md): tests, build check, GitHub release, then npm.
-# The npm step runs only when NPM_TOKEN (secret) or NPM_TRUSTED_PUBLISHING=true (variable) is set.
+# Push a tag vX.Y.Z (see RELEASING.md).
+# - Job "test": the CI jobs.
+# - Job "release": checks the tag and that dist/ is the build, packs the npm
+#   tarball (its README with utm_source=npm, the copy npmjs.com shows) and
+#   creates the GitHub release with the built file and the tarball.
+# - Job "publish": publishes that same tarball to npm with trusted publishing
+#   (GitHub's OIDC token, no npm token) and provenance. It runs only when the
+#   repository variable NPM_PUBLISH is "true".
 name: Release
 
 on:
   push:
     tags: ['v*']
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: release-${{ github.ref }}
@@ -15,6 +20,8 @@ concurrency:
 
 jobs:
   test:
+    permissions:
+      contents: read
     uses: ./.github/workflows/ci.yml
 
   release:
@@ -23,24 +30,33 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write # the GitHub release
-      id-token: write # npm provenance and trusted publishing
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      NPM_TRUSTED_PUBLISHING: ${{ vars.NPM_TRUSTED_PUBLISHING }}
+    outputs:
+      name: ${{ steps.version.outputs.name }}
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      tarball: ${{ steps.pack.outputs.tarball }}
     steps:
       - uses: actions/checkout@v7
+      # No dependency cache in a release: a poisoned cache could change what gets published.
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - run: npm ci
       - name: The tag matches package.json
+        id: version
         run: |
           version="$(node -p "require('./package.json').version")"
           if [ "$GITHUB_REF_NAME" != "v$version" ]; then
             echo "::error::Tag $GITHUB_REF_NAME, but package.json says $version."
             exit 1
           fi
+          echo "name=$(node -p "require('./package.json').name")" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          case "$version" in
+            *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
       - name: dist/ in the tag is the build (jsDelivr serves it from the tag)
         run: |
           npm run build
@@ -49,23 +65,103 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           # The lines under "## [X.Y.Z]" up to the next "## ", without the link definitions at the end.
-          awk -v v="## [$version]" 'index($0, v) == 1 { found = 1; next } found && /^## / { exit } found && !/^\[[^]]+\]: / { print }' CHANGELOG.md > notes.md
-          if ! grep -q '[^[:space:]]' notes.md; then
+          awk -v v="## [$version]" 'index($0, v) == 1 { found = 1; next } found && /^## / { exit } found && !/^\[[^]]+\]: / { print }' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
             echo "::error::CHANGELOG.md has no section ## [$version]."
             exit 1
           fi
-          cat notes.md
+          cat "$RUNNER_TEMP/notes.md"
+
+      # npmjs.com shows the README from the tarball: its links say utm_source=npm.
+      # Only this checkout's copy changes, never the file in the repository.
+      - name: README for npm (utm_source=npm)
+        run: |
+          sed -i 's/utm_source=github/utm_source=npm/g' README.md
+          if grep -q 'utm_source=github' README.md; then
+            echo "::error::README.md still has utm_source=github."
+            exit 1
+          fi
+      - name: Pack
+        id: pack
+        run: |
+          mkdir -p "$RUNNER_TEMP/pack"
+          npm pack --pack-destination "$RUNNER_TEMP/pack"
+          tarball="$(ls "$RUNNER_TEMP"/pack/*.tgz)"
+          echo "tarball=$(basename "$tarball")" >> "$GITHUB_OUTPUT"
+          sha256sum "$tarball"
+          echo "Links in the packed README, by source:"
+          tar -xOzf "$tarball" package/README.md | grep -o 'utm_source=[a-z]*' | sort | uniq -c
+      - uses: actions/upload-artifact@v7
+        with:
+          name: npm-package
+          path: ${{ runner.temp }}/pack/${{ steps.pack.outputs.tarball }}
+          if-no-files-found: error
+
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/whatsapp-chat-button.min.js --verify-tag --title "$GITHUB_REF_NAME" --notes-file notes.md
-      - name: Publish to npm
-        if: env.NPM_TOKEN != '' || env.NPM_TRUSTED_PUBLISHING == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+          TARBALL: ${{ runner.temp }}/pack/${{ steps.pack.outputs.tarball }}
         run: |
-          npm install -g npm@11
-          npm publish --provenance --access public
-      - name: npm publish skipped
-        if: env.NPM_TOKEN == '' && env.NPM_TRUSTED_PUBLISHING != 'true'
-        run: echo "::notice::npm publish skipped. Set the NPM_TOKEN secret or the NPM_TRUSTED_PUBLISHING variable, see RELEASING.md."
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "::notice::The release $GITHUB_REF_NAME already exists."
+            exit 0
+          fi
+          flags=()
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" dist/whatsapp-chat-button.min.js "$TARBALL" \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            "${flags[@]}"
+      - name: npm publishing is off
+        if: vars.NPM_PUBLISH != 'true'
+        run: echo "::notice::Not published to npm (the repository variable NPM_PUBLISH is not true). The tarball is on the GitHub release; see RELEASING.md."
+
+  publish:
+    name: Publish to npm
+    needs: release
+    if: vars.NPM_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The trusted publisher on npmjs.com names this environment: only this job can publish.
+    environment: npm
+    permissions:
+      id-token: write # npm trusted publishing (OIDC) and provenance; nothing else
+    steps:
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      # Trusted publishing needs npm 11.5.1 or newer.
+      - run: npm install -g npm@11.21.1 && npm --version
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-package
+          path: ${{ runner.temp }}/pack
+
+      - name: Publish
+        env:
+          NAME: ${{ needs.release.outputs.name }}
+          VERSION: ${{ needs.release.outputs.version }}
+          PRERELEASE: ${{ needs.release.outputs.prerelease }}
+          TARBALL: ${{ runner.temp }}/pack/${{ needs.release.outputs.tarball }}
+          # Empty in the steady state. Only for a first publish with provenance: a
+          # one-day token saved as a secret of the "npm" environment, deleted after
+          # the run (RELEASING.md). Trusted publishing is tried first either way.
+          BOOTSTRAP_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          sha256sum "$TARBALL"
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "::notice::$NAME@$VERSION is already on npm."
+            exit 0
+          fi
+          if [ -n "$BOOTSTRAP_TOKEN" ]; then
+            echo "::warning::The npm environment has an NPM_TOKEN secret. After this run, delete the secret and revoke the token on npmjs.com (RELEASING.md)."
+            npm config set "//registry.npmjs.org/:_authToken" "$BOOTSTRAP_TOKEN"
+          fi
+          dist_tag=latest
+          if [ "$PRERELEASE" = "true" ]; then dist_tag=next; fi
+          npm publish "$TARBALL" --provenance --access public --tag "$dist_tag"
