@@ -97,15 +97,21 @@ async function load(html, opts = {}) {
   return { page, context, log };
 }
 
+// Waits a moment, then until the button's transitions (fade-in, popup, label) have
+// finished: on a cold or busy machine they can outlast a fixed wait.
+async function transitions(page, ms = 300) {
+  await page.waitForTimeout(ms);
+  await page.evaluate(() => {
+    const host = document.querySelector('whatsapp-chat-button');
+    const wrap = host && host.shadowRoot.querySelector('.w');
+    if (wrap) return Promise.all(wrap.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => {})));
+  });
+}
+
 // The button is in place and its fade-in has finished.
 async function settle(page) {
   await page.waitForSelector(HOST + ' .w.v', { state: 'attached', timeout: 5000 });
-  await page.waitForTimeout(400);
-  // On a cold or busy machine the fade-in can outlast the wait: let it finish.
-  await page.evaluate(() => {
-    const wrap = document.querySelector('whatsapp-chat-button').shadowRoot.querySelector('.w');
-    return Promise.all(wrap.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => {})));
-  });
+  await transitions(page, 400);
 }
 
 const inShadow = (page, fn, arg) =>
@@ -283,15 +289,15 @@ test('label-hover: the label is a tooltip on hover and keyboard focus', async ()
   const icon = await page.locator(HOST + ' .i').boundingBox();
   assert.equal(icon.x + icon.width, 1260, 'the hidden label takes no space');
   await page.locator(HOST + ' .i').hover();
-  await page.waitForTimeout(300);
+  await transitions(page);
   assert.equal(await styleOf(page, '.lb', 'visibility'), 'visible');
   assert.equal(await styleOf(page, '.lb', 'opacity'), '1');
   await page.mouse.move(10, 10);
-  await page.waitForTimeout(300);
+  await transitions(page);
   assert.equal(await styleOf(page, '.lb', 'visibility'), 'hidden');
   if (TABS_TO_LINKS) {
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(300);
+    await transitions(page);
     assert.equal(await styleOf(page, '.lb', 'visibility'), 'visible');
   }
   clean(log);
@@ -327,7 +333,7 @@ test('greeting popup: mouse, keyboard, focus and Esc', async () => {
   await page.keyboard.press('Escape');
   assert.equal(await b.getAttribute('aria-expanded'), 'false');
   assert.equal(await focused(page), 'b', 'Esc returns focus to the button');
-  await page.waitForTimeout(300);
+  await transitions(page);
   assert.equal(await styleOf(page, '.p', 'visibility'), 'hidden');
 
   // Space opens it too; Shift+Tab reaches the close button; Tab from "Start chat" goes back to the button.
@@ -452,7 +458,7 @@ test('phone viewport: tap opens the popup, which fits the screen; no sideways sc
   const lb = await page.locator(HOST + ' .lb').boundingBox();
   assert.ok(lb.x >= 0, 'label stays on screen');
   await page.locator(HOST + ' .i').tap();
-  await page.waitForTimeout(300);
+  await transitions(page);
   assert.equal(await page.locator(HOST + ' .b').getAttribute('aria-expanded'), 'true');
   const p = await page.locator(HOST + ' .p').boundingBox();
   assert.ok(p.x >= 0 && p.x + p.width <= 360 && p.y >= 0, 'popup on screen: ' + JSON.stringify(p));
@@ -521,10 +527,10 @@ test('JavaScript API: init, open, close, hide, show, destroy; loading the script
   await page.evaluate(() => WhatsAppChatButton.close());
   assert.equal(await page.locator(HOST + ' .b').getAttribute('aria-expanded'), 'false');
   await page.evaluate(() => WhatsAppChatButton.hide());
-  await page.waitForTimeout(400);
+  await transitions(page, 400);
   assert.equal(await page.locator(HOST + ' .b').isVisible(), false);
   await page.evaluate(() => WhatsAppChatButton.show());
-  await page.waitForTimeout(400);
+  await transitions(page, 400);
   assert.equal(await page.locator(HOST + ' .b').isVisible(), true);
   await page.evaluate(() => WhatsAppChatButton.destroy());
   assert.equal(await page.locator(HOST).count(), 0);
@@ -660,7 +666,7 @@ test('strict Content-Security-Policy with Trusted Types: works, no violations', 
   assert.equal(await styleOf(page, '.i', 'backgroundColor'), 'rgb(37, 211, 102)', 'styles applied without style-src');
   assert.equal(await styleOf(page, '.w', 'position'), 'fixed');
   await page.locator(HOST + ' .b').click();
-  await page.waitForTimeout(300);
+  await transitions(page);
   assert.equal(await styleOf(page, '.p', 'visibility'), 'visible');
   assert.equal(await inShadow(page, (root) => root.querySelector('.av img').getAttribute('src')), 'https://site.test/tests/avatar.svg');
   clean(log);
