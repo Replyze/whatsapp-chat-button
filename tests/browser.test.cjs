@@ -24,9 +24,10 @@ try {
   playwright = require('playwright-core');
 }
 const ENGINE = process.env.BROWSER || 'chromium';
-// WebKit (Safari) leaves links out of the Tab order unless the user turns on
-// "Press Tab to highlight each item"; buttons are still in it.
-const TABS_TO_LINKS = ENGINE !== 'webkit';
+// Safari leaves links out of the Tab order unless the user turns on "Press Tab to
+// highlight each item"; buttons are still in it. Playwright's WebKit does the same on
+// macOS and Windows but not on Linux, so the run asks the browser (tabsToLinks below).
+let TABS_TO_LINKS = true;
 
 const ROOT = path.join(__dirname, '..');
 const ORIGIN = 'https://site.test';
@@ -129,6 +130,13 @@ function clean(log, expectedWarnings = []) {
   assert.deepEqual(log.errors, [], 'console errors');
   assert.equal(log.warnings.length, expectedWarnings.length, 'console warnings: ' + JSON.stringify(log.warnings));
   expectedWarnings.forEach((w, i) => assert.match(log.warnings[i], w));
+}
+
+async function tabsToLinks() {
+  const { page } = await load(doc('<button id="first">First</button><a id="link" href="#top">Link</a>'));
+  await page.focus('#first');
+  await page.keyboard.press('Tab');
+  return page.evaluate(() => document.activeElement.id === 'link');
 }
 
 const tests = [];
@@ -872,7 +880,10 @@ test('generator: fits a phone screen', async () => {
 
 (async () => {
   browser = await playwright[ENGINE].launch({ executablePath: (ENGINE === 'chromium' && process.env.CHROMIUM_PATH) || undefined });
-  console.log(ENGINE + ' ' + browser.version() + '\n');
+  TABS_TO_LINKS = await tabsToLinks();
+  await Promise.all(contexts.map((c) => c.close().catch(() => {})));
+  contexts = [];
+  console.log(ENGINE + ' ' + browser.version() + (TABS_TO_LINKS ? '' : ' (Tab skips links)') + '\n');
   const only = process.argv[2];
   let failed = 0;
   let run = 0;
